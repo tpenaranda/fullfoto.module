@@ -29,9 +29,21 @@ const getConnectedPrinters = async () => {
       output.push(row.replace(/^.*usb:\/\//, '').replace(/\?.*/, '').replace('/', ' ').replace(/\+/g, ' '))
     }
   } catch (e) {
-    Bugsnag.notify()
+    notify(e)
+  }
 
-    return output
+  try {
+    const shellExec = shell.exec('lsusb')
+
+    for (const row of shellExec.stdout.split('\n')) {
+      if (!row.includes('040a:404f')) {
+        continue
+      }
+
+      output.push(row.replace(/^.*040a:404f /, ''))
+    }
+  } catch (e) {
+    notify(e)
   }
 
   return output
@@ -70,10 +82,10 @@ router.post('/print', async (req, res, next) => {
 
     writeFileSync(fullFileName, imageData, { encoding: 'base64' })
 
-    shell.exec(`ls -la ${fullFileName}`)
+    const requestResponse = shell.exec(`lp -d KODAK_305_Photo_Printer -o media=w432h576 ${fullFileName}`)
   }
 
-  return res.json({ data: { status: 'ok' } }).status(201);
+  return res.json({ data: {} }).status(201);
 });
 
 router.all('*', async (req, res, next) => res.status(404).json({ message: 'not_found' }))
