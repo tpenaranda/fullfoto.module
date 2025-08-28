@@ -18,19 +18,19 @@ const crypto = require('crypto');
 const getConnectedPrinters = async () => {
   const output = []
 
-  try {
-    const shellExec = shell.exec('lpinfo -v')
+  //try {
+  //  const shellExec = shell.exec('lpinfo -v')
 
-    for (const row of shellExec.stdout.split('\n')) {
-      if (!row.includes('usb://')) {
-        continue
-      }
+  //  for (const row of shellExec.stdout.split('\n')) {
+  //    if (!row.includes('usb://')) {
+  //      continue
+  //    }
 
-      output.push(row.replace(/^.*usb:\/\//, '').replace(/\?.*/, '').replace('/', ' ').replace(/\+/g, ' '))
-    }
-  } catch (e) {
-    notify(e)
-  }
+  //    output.push(row.replace(/^.*usb:\/\//, '').replace(/\?.*/, '').replace('/', ' ').replace(/\+/g, ' '))
+  //  }
+  //} catch (e) {
+  //  notify(e)
+  //}
 
   try {
     const shellExec = shell.exec('lsusb')
@@ -78,9 +78,26 @@ router.post('/print', async (req, res, next) => {
 
   for (const base64Image of data) {
     const imageData = base64Image.replace(/^data:([A-Za-z-+/]+);base64,/, '')
+    const imgBuffer = Buffer.from(imageData)
+
     const fullFileName = `/tmp/${crypto.randomUUID()}.jpg`
 
-    writeFileSync(fullFileName, imageData, { encoding: 'base64' })
+    const sharpImage = await sharp(imgBuffer)
+    const { width, height, orientation } = await sharpImage.metadata()
+
+    const isVertical = height > width
+
+    const outputWidth = isVertical ? width : (height * 0.75)
+    const outputHeight = isVertical ? (width * 0.75) : height
+
+    const outputImage = sharpImage.resize({
+      width: outputWidth,
+      height: outputHeight,
+      fit: sharp.fit.cover,
+      position: sharp.strategy.entropy
+    }).jpeg({ quality: 100 })
+
+    await outputImage.toFile(fullFileName)
 
     const requestResponse = shell.exec(`lp -d KODAK_305_Photo_Printer -o media=w432h576 ${fullFileName}`)
   }
