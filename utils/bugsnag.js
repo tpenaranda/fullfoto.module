@@ -1,6 +1,5 @@
 require('dotenv').config()
 
-const { moduleData, mainApiUrl } = require('./generic')
 const Bugsnag = require('@bugsnag/js');
 const BugsnagPluginExpress = require('@bugsnag/plugin-express')
 
@@ -11,7 +10,7 @@ Bugsnag.start({
   collectUserIp: false,
   appType: 'module',
   metadata: {
-    module_id: moduleData.id,
+    module_id: process.env.MODULE_ID || '?',
   },
   redactedKeys: [
     /^pass$/i,
