@@ -10,48 +10,14 @@ const diskSpace = require('check-disk-space').default
 const os = require('os')
 const drivelist = require('drivelist');
 const readdir = require('@folder/readdir');
-const { createFolderIfDoesNotExists, mainApiUrl, storeData, baseHeaders } = require('../utils/generic')
+const { createFolderIfDoesNotExists, mainApiUrl, storeData, baseHeaders, moduleData, getConnectedPrinters } = require('../utils/generic')
 const ms = require('ms')
 const Queue = require('better-queue');
 const crypto = require('crypto');
 
-const getConnectedPrinters = async () => {
-  const output = []
-
-  //try {
-  //  const shellExec = shell.exec('lpinfo -v')
-
-  //  for (const row of shellExec.stdout.split('\n')) {
-  //    if (!row.includes('usb://')) {
-  //      continue
-  //    }
-
-  //    output.push(row.replace(/^.*usb:\/\//, '').replace(/\?.*/, '').replace('/', ' ').replace(/\+/g, ' '))
-  //  }
-  //} catch (e) {
-  //  notify(e)
-  //}
-
-  try {
-    const shellExec = shell.exec('lsusb')
-
-    for (const row of shellExec.stdout.split('\n')) {
-      if (!row.includes('040a:404f')) {
-        continue
-      }
-
-      output.push(row.replace(/^.*040a:404f /, ''))
-    }
-  } catch (e) {
-    notify(e)
-  }
-
-  return output
-}
-
 router.get('/ping', async (req, res, next) => {
   const data = {
-    id: '',
+    id: moduleData.id || '?',
     type: 'module',
     printers: await getConnectedPrinters(),
   }
