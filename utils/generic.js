@@ -1,5 +1,7 @@
 require('dotenv').config()
 
+const { notify: bugsnagNotify } = require('./bugsnag');
+const shell = require('shelljs');
 const { existsSync, mkdirSync, chmodSync } = require('fs');
 const ms = require('ms')
 
@@ -17,7 +19,7 @@ const getConnectedPrinters = async () => {
   //    output.push({ name: row.replace(/^.*usb:\/\//, '').replace(/\?.*/, '').replace('/', ' ').replace(/\+/g, ' ') })
   //  }
   //} catch (e) {
-  //  notify(e)
+  //  bugsnagNotify(e)
   //}
 
   try {
@@ -31,7 +33,7 @@ const getConnectedPrinters = async () => {
       output.push({ name: row.replace(/^.*040a:404f /, '') })
     }
   } catch (e) {
-    notify(e)
+    bugsnagNotify(e)
   }
 
   return output
