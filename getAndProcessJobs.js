@@ -12,7 +12,6 @@ const getAndProcessJobs = async () => {
   const response = await fetch(`${localApiUrl}/jobs`, { signal: AbortSignal.timeout(ms('10s')), method: 'GET', headers: baseHeaders })
   const jsonData = await response.json()
 
-
   for (const { id, data, type, status } of jsonData.data) {
     if (status !== 'created') {
       continue
@@ -34,7 +33,7 @@ const getAndProcessJobs = async () => {
           const urlResponse = await fetch(url)
           const imgBuffer = await urlResponse.buffer()
 
-          const fullFileName = `/tmp/${crypto.randomUUID()}.jpg`
+          const fullFileName = `/tmp/${crypto.randomUUID()}.png`
 
           const sharpImage = await sharp(imgBuffer)
           const { width, height, orientation } = await sharpImage.metadata()
@@ -49,7 +48,7 @@ const getAndProcessJobs = async () => {
             height: outputHeight,
             fit: sharp.fit.cover,
             position: sharp.strategy.entropy
-          }).jpeg({ quality: 100 })
+          }).png({ compressionLevel: 0 })
 
           await outputImage.toFile(fullFileName)
 
@@ -59,7 +58,7 @@ const getAndProcessJobs = async () => {
         }
       }
 
-      const patchResponse = await fetch(`${localApiUrl}/jobs/${job.id}`, { signal: AbortSignal.timeout(ms('10s')), body: JSON.stringify({ status: 'completed' }), method: 'PATCH', headers: baseHeaders })
+      const patchResponse = await fetch(`${localApiUrl}/jobs/${id}`, { signal: AbortSignal.timeout(ms('10s')), body: JSON.stringify({ status: 'completed' }), method: 'PATCH', headers: baseHeaders })
     }
   }
 
