@@ -18,7 +18,7 @@ const getAndProcessJobs = async () => {
     }
 
     if (type === 'print') {
-      const { method, size, items } = data
+      const { method, size, items, output, position } = data
 
       if (size !== '15x20' || method !== 'single' || !items || !items.length) {
         continue
@@ -47,12 +47,12 @@ const getAndProcessJobs = async () => {
             width: outputWidth,
             height: outputHeight,
             fit: sharp.fit.cover,
-            position: sharp.strategy.entropy
+            position: position || sharp.strategy.entropy,
           }).png({ compressionLevel: 0 })
 
           await outputImage.toFile(fullFileName)
 
-          const requestResponse = shell.exec(`lp -d KODAK_305_Photo_Printer -o media=w432h576 ${fullFileName}`)
+          const requestResponse = shell.exec(`lp -d ${output || 'KODAK_305_Photo_Printer'} -o media=w432h576 ${fullFileName}`)
         } catch (e) {
           bugsnagNotify(e)
         }
