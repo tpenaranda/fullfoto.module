@@ -22,7 +22,7 @@ const getConnectedPrinters = async () => {
         continue
       }
 
-      output.push({ name: parts[0].replace('device for ', ''), location: parts[1] })
+      output.push({ name: parts[0].replace('device for ', ''), connection: parts[1] })
     }
   } catch (e) {
     bugsnagNotify(e)
