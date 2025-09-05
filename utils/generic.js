@@ -8,29 +8,21 @@ const ms = require('ms')
 const getConnectedPrinters = async () => {
   const output = []
 
-  //try {
-  //  const shellExec = shell.exec('lpinfo -v')
-
-  //  for (const row of shellExec.stdout.split('\n')) {
-  //    if (!row.includes('usb://')) {
-  //      continue
-  //    }
-
-  //    output.push({ name: row.replace(/^.*usb:\/\//, '').replace(/\?.*/, '').replace('/', ' ').replace(/\+/g, ' ') })
-  //  }
-  //} catch (e) {
-  //  bugsnagNotify(e)
-  //}
-
   try {
-    const shellExec = shell.exec('lsusb')
+    const shellExec = shell.exec('lpstat -v')
 
     for (const row of shellExec.stdout.split('\n')) {
-      if (!row.includes('040a:404f')) {
+      if (!row.includes(': ')) {
         continue
       }
 
-      output.push({ name: row.replace(/^.*040a:404f /, '') })
+      const parts = row.split(': ')
+
+      if (parts.length !== 2) {
+        continue
+      }
+
+      output.push({ name: parts[0].replace('device for ', ''), location: parts[1] })
     }
   } catch (e) {
     bugsnagNotify(e)
