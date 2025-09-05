@@ -40,8 +40,8 @@ const getAndProcessJobs = async () => {
 
           const isVertical = height > width
 
-          const outputWidth = isVertical ? width : (height * 0.75)
-          const outputHeight = isVertical ? (width * 0.75) : height
+          const outputWidth = !isVertical ? width : (height * 0.75)
+          const outputHeight = !isVertical ? (width * 0.75) : height
 
           const outputImage = sharpImage.resize({
             width: outputWidth,
