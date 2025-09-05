@@ -14,7 +14,7 @@ const Queue = require('better-queue');
 
 router.get('/ping', async (req, res, next) => {
   const data = {
-    ...moduleData.id,
+    ...moduleData,
     type: 'module',
     printers: await getConnectedPrinters(),
   }
