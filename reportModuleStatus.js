@@ -10,6 +10,7 @@ const reportModuleStatus = async () => {
     ...moduleData,
     type: 'module',
     printers: await getConnectedPrinters(),
+    network_interfaces: os.networkInterfaces(),
   }
 
   const response = await fetch(`${localApiUrl}/modules`, { signal: AbortSignal.timeout(ms('10s')), body: JSON.stringify(data), method: 'POST', headers: baseHeaders })
