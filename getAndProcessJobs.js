@@ -74,6 +74,7 @@ const run = async () => {
     await getAndProcessJobs()
   } catch (e) {
     bugsnagNotify(e)
+    await sleep('2m')
   } finally {
     const now = new Date()
     console.info(`${now.toGMTString()} | getAndProcessJobs() Done.`)
