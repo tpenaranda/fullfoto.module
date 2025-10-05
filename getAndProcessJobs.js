@@ -12,6 +12,10 @@ const getAndProcessJobs = async () => {
   const response = await fetch(`${localApiUrl}/jobs`, { signal: AbortSignal.timeout(ms('10s')), method: 'GET', headers: baseHeaders })
   const jsonData = await response.json()
 
+  if (!jsonData || !jsonData.length) {
+    return false
+  }
+
   for (const { id, data, type, status } of jsonData.data) {
     if (status !== 'created') {
       continue
@@ -44,8 +48,8 @@ const getAndProcessJobs = async () => {
           const outputHeight = !isVertical ? (width * 0.75) : height
 
           const outputImage = sharpImage.resize({
-            width: outputWidth,
-            height: outputHeight,
+            width: Math.round(outputWidth),
+            height: Math.round(outputHeight),
             fit: sharp.fit.cover,
             position: position || sharp.strategy.entropy,
           }).png({ compressionLevel: 0 })
