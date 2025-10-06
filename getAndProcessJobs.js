@@ -12,7 +12,7 @@ const getAndProcessJobs = async () => {
   const response = await fetch(`${localApiUrl}/jobs`, { signal: AbortSignal.timeout(ms('10s')), method: 'GET', headers: baseHeaders })
   const jsonData = await response.json()
 
-  if (!jsonData || !jsonData.length) {
+  if (!jsonData || !jsonData.data) {
     return false
   }
 
