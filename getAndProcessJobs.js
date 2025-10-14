@@ -28,6 +28,9 @@ const getAndProcessJobs = async () => {
         continue
       }
 
+      const printerName = output || 'KODAK_305_Photo_Printer'
+      shell.exec(`cupsenable ${printerName}`)
+
       for (const { url } of items) {
         if (!url) {
           continue
@@ -56,7 +59,7 @@ const getAndProcessJobs = async () => {
 
           await outputImage.toFile(fullFileName)
 
-          const requestResponse = shell.exec(`lp -d ${output || 'KODAK_305_Photo_Printer'} -o media=w432h576 ${fullFileName}`)
+          const requestResponse = shell.exec(`lp -d ${printerName} -o media=w432h576 ${fullFileName}`)
         } catch (e) {
           bugsnagNotify(e)
         }
