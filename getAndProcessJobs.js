@@ -24,7 +24,7 @@ const getAndProcessJobs = async () => {
     if (type === 'print') {
       const { method, size, items, output, position } = data
 
-      if (size !== '15x20' || method !== 'single' || !items || !items.length) {
+      if (!['10x15', '15x20'].includes(size) || method !== 'single' || !items || !items.length) {
         continue
       }
 
@@ -59,7 +59,13 @@ const getAndProcessJobs = async () => {
 
           await outputImage.toFile(fullFileName)
 
-          const requestResponse = shell.exec(`lp -d ${printerName} -o media=w432h576 ${fullFileName}`)
+          if (size === '10x15') {
+            shell.exec(`lp -d ${printerName} -o print-quality=5 -o media=w288h432 ${fullFileName}`)
+          }
+
+          if (size === '15x20') {
+            shell.exec(`lp -d ${printerName} -o print-quality=5 -o media=w432h576 ${fullFileName}`)
+          }
         } catch (e) {
           bugsnagNotify(e)
         }
