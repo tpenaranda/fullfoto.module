@@ -47,8 +47,10 @@ const getAndProcessJobs = async () => {
 
           const isVertical = height > width
 
-          const outputWidth = !isVertical ? width : (height * 0.75)
-          const outputHeight = !isVertical ? (width * 0.75) : height
+          const aspectRatio = size.split('x').map(Number).reverse().reduce((acc, i) => i / acc, 1)
+
+          const outputWidth = !isVertical ? width : (height * aspectRatio)
+          const outputHeight = !isVertical ? (width * aspectRatio) : height
 
           const outputImage = sharpImage.resize({
             width: Math.round(outputWidth),
