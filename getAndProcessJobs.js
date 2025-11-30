@@ -28,8 +28,8 @@ const getAndProcessJobs = async () => {
         continue
       }
 
-      const printerName = output || 'KODAK_305_Photo_Printer'
-      shell.exec(`cupsenable ${printerName}`)
+      shell.exec(`cupsaccept ${output}`)
+      shell.exec(`cupsenable ${output}`)
 
       for (const { url } of items) {
         if (!url) {
@@ -62,11 +62,11 @@ const getAndProcessJobs = async () => {
           await outputImage.toFile(fullFileName)
 
           if (size === '10x15') {
-            shell.exec(`lp -d ${printerName} -o print-quality=5 -o media=w288h432 ${fullFileName}`)
+            shell.exec(`lp -d ${output} -o print-quality=5 -o media=w288h432 ${fullFileName}`)
           }
 
           if (size === '15x20') {
-            shell.exec(`lp -d ${printerName} -o print-quality=5 -o media=w432h576 ${fullFileName}`)
+            shell.exec(`lp -d ${output} -o print-quality=5 -o media=w432h576 ${fullFileName}`)
           }
         } catch (e) {
           bugsnagNotify(e)
@@ -90,7 +90,6 @@ const run = async () => {
     const now = new Date()
     console.info(`${now.toGMTString()} | getAndProcessJobs() Done.`)
     await sleep('10s')
-    process.exit()
   }
 }
 

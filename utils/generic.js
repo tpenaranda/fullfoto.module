@@ -6,7 +6,28 @@ const { existsSync, mkdirSync, chmodSync } = require('fs');
 const ms = require('ms')
 
 const getConnectedPrinters = async () => {
+  const activeConnections = []
   const output = []
+
+  try {
+    const shellExec = shell.exec('lpinfo -v')
+
+    for (const row of shellExec.stdout.split('\n')) {
+      if (!row.startsWith('direct')) {
+        continue
+      }
+
+      const parts = row.split(' ')
+
+      if (parts.length !== 2) {
+        continue
+      }
+
+      activeConnections.push(parts[1])
+    }
+  } catch (e) {
+    bugsnagNotify(e)
+  }
 
   try {
     const shellExec = shell.exec('lpstat -v')
@@ -22,7 +43,14 @@ const getConnectedPrinters = async () => {
         continue
       }
 
-      output.push({ name: parts[0].replace('device for ', ''), connection: parts[1] })
+      const name = parts[0].replace('device for ', '')
+      const connection = parts[1]
+
+      if (!activeConnections.includes(connection)) {
+        continue
+      }
+
+      output.push({ name, connection })
     }
   } catch (e) {
     bugsnagNotify(e)

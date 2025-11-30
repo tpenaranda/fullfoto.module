@@ -27,8 +27,7 @@ const run = async () => {
   } finally {
     const now = new Date()
     console.info(`${now.toGMTString()} | reportModuleStatus() Done.`)
-    await sleep('2m')
-    process.exit()
+    await sleep('1m')
   }
 }
 
