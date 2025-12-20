@@ -1,4 +1,3 @@
-const fetch = require('node-fetch');
 const os = require('os');
 const ms = require('ms');
 const { createReadStream, statSync, readdirSync } = require('fs');
@@ -39,12 +38,9 @@ const getAndProcessJobs = async () => {
         }
 
         try {
-          const urlResponse = await fetch(url)
-          const imgBuffer = await urlResponse.buffer()
+          const urlResponse = await fetch(url, { signal: AbortSignal.timeout(ms('10s')), method: 'GET', headers: baseHeaders })
 
-          const fullFileName = `/tmp/${crypto.randomUUID()}.png`
-
-          const sharpImage = await sharp(imgBuffer)
+          const sharpImage = await sharp(await urlResponse.arrayBuffer())
           const { width, height, orientation } = await sharpImage.metadata()
 
           const isVertical = height > width
@@ -61,6 +57,7 @@ const getAndProcessJobs = async () => {
             position: position || sharp.strategy.entropy,
           }).png({ compressionLevel: 0 })
 
+          const fullFileName = `/tmp/${crypto.randomUUID()}.png`
           await outputImage.toFile(fullFileName)
 
           if (size === '10x15') {
