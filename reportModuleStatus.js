@@ -13,21 +13,23 @@ const reportModuleStatus = async () => {
     network_interfaces: os.networkInterfaces(),
   }
 
-  const response = await fetch(`${localApiUrl}/modules`, { signal: AbortSignal.timeout(ms('10s')), body: JSON.stringify(data), method: 'POST', headers: baseHeaders })
-  const jsonData = await response.json()
-
-  return jsonData
+  return await fetch(`${localApiUrl}/modules`, { signal: AbortSignal.timeout(ms('10s')), body: JSON.stringify(data), method: 'POST', headers: baseHeaders })
 }
 
 const run = async () => {
   try {
-    await reportModuleStatus()
+    const { status } = await reportModuleStatus()
+
+    if (status === 200) {
+      await sleep('30m')
+    }
   } catch (e) {
     bugsnagNotify(e)
   } finally {
     const now = new Date()
     console.info(`${now.toGMTString()} | reportModuleStatus() Done.`)
     await sleep('1m')
+    process.exit()
   }
 }
 
