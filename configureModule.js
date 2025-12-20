@@ -9,7 +9,7 @@ const ms = require('ms')
 const sharp = require('sharp');
 
 const configureModule = async () => {
-  const pingResponse = await fetch(`${localApiUrl}/stores/ping`, { signal: AbortSignal.timeout(ms('10s')), headers: baseHeaders, method: 'GET' })
+  const pingResponse = await fetch(`${localApiUrl}/ping`, { signal: AbortSignal.timeout(ms('10s')), headers: baseHeaders, method: 'GET' })
 
   if (pingResponse.status !== 200) {
     return false
