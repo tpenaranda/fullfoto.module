@@ -12,9 +12,11 @@ const getAndProcessJobs = async () => {
   const response = await fetch(`${localApiUrl}/jobs`, { signal: AbortSignal.timeout(ms('10s')), method: 'GET', headers: baseHeaders })
   const jsonData = await response.json()
 
-  if (!jsonData || !jsonData.data) {
+  if (!jsonData || !jsonData.data || !jsonData.length) {
     return false
   }
+
+  const connectedPrinters = await getConnectedPrinters()
 
   for (const { id, data, type, status } of jsonData.data) {
     if (status !== 'created') {
@@ -24,7 +26,7 @@ const getAndProcessJobs = async () => {
     if (type === 'print') {
       const { method, size, items, output, position } = data
 
-      if (!['10x15', '15x20'].includes(size) || method !== 'single' || !items || !items.length) {
+      if (!['10x15', '15x20'].includes(size) || method !== 'single' || !items || !items.length || !connectedPrinters.map(i => i.name).includes(output)) {
         continue
       }
 
