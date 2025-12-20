@@ -1,5 +1,5 @@
 const { notify: bugsnagNotify } = require('./utils/bugsnag')
-const { sleep, createFolderIfDoesNotExists, baseHeaders, storeData, mainApiUrl } = require('./utils/generic')
+const { sleep, createFolderIfDoesNotExists, baseHeaders, storeData, mainApiUrl, localApiUrl } = require('./utils/generic')
 const readdir = require('@folder/readdir')
 const { statSync, unlinkSync, readdirSync, renameSync, copyFileSync, chmodSync } = require('fs')
 const { execSync } = require('child_process');
