@@ -38,6 +38,12 @@ const getAndProcessJobs = async () => {
         }
 
         try {
+          const patchResponse = await fetch(`${localApiUrl}/jobs/${id}`, { signal: AbortSignal.timeout(ms('20s')), body: JSON.stringify({ status: 'in_progress' }), method: 'PATCH', headers: baseHeaders })
+
+          if (patchResponse.status !== 200) {
+            continue
+          }
+
           const urlResponse = await fetch(url, { signal: AbortSignal.timeout(ms('10s')), method: 'GET', headers: baseHeaders })
 
           const sharpImage = await sharp(await urlResponse.arrayBuffer())
@@ -72,7 +78,7 @@ const getAndProcessJobs = async () => {
         }
       }
 
-      const patchResponse = await fetch(`${localApiUrl}/jobs/${id}`, { signal: AbortSignal.timeout(ms('10s')), body: JSON.stringify({ status: 'completed' }), method: 'PATCH', headers: baseHeaders })
+      await fetch(`${localApiUrl}/jobs/${id}`, { signal: AbortSignal.timeout(ms('20s')), body: JSON.stringify({ status: 'completed' }), method: 'PATCH', headers: baseHeaders })
     }
   }
 

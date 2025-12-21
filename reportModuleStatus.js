@@ -13,7 +13,7 @@ const reportModuleStatus = async () => {
     network_interfaces: os.networkInterfaces(),
   }
 
-  return await fetch(`${localApiUrl}/modules`, { signal: AbortSignal.timeout(ms('10s')), body: JSON.stringify(data), method: 'POST', headers: baseHeaders })
+  return await fetch(`${localApiUrl}/modules`, { signal: AbortSignal.timeout(ms('20s')), body: JSON.stringify(data), method: 'POST', headers: baseHeaders })
 }
 
 const run = async () => {
@@ -21,7 +21,7 @@ const run = async () => {
     const { status } = await reportModuleStatus()
 
     if (status === 200) {
-      await sleep('30m')
+      await sleep('15m')
     }
   } catch (e) {
     bugsnagNotify(e)
