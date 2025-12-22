@@ -8,7 +8,7 @@ const sharp = require('sharp');
 const shell = require('shelljs');
 
 const getAndProcessJobs = async () => {
-  const response = await fetch(`${localApiUrl}/jobs`, { signal: AbortSignal.timeout(ms('10s')), method: 'GET', headers: baseHeaders })
+  const response = await fetch(`${localApiUrl}/jobs`, { signal: AbortSignal.timeout(ms('12s')), method: 'GET', headers: baseHeaders })
   const jsonData = await response.json()
 
   if (!jsonData || !jsonData.data || !jsonData.data.length) {
@@ -44,7 +44,7 @@ const getAndProcessJobs = async () => {
             continue
           }
 
-          const urlResponse = await fetch(url, { signal: AbortSignal.timeout(ms('10s')), method: 'GET', headers: baseHeaders })
+          const urlResponse = await fetch(url, { signal: AbortSignal.timeout(ms('12s')), method: 'GET', headers: baseHeaders })
 
           const sharpImage = await sharp(await urlResponse.arrayBuffer())
           const { width, height, orientation } = await sharpImage.metadata()
