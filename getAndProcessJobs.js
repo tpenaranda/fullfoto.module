@@ -61,7 +61,7 @@ const getAndProcessJobs = async () => {
             height: Math.round(outputHeight),
             fit: sharp.fit.cover,
             position: position || sharp.strategy.entropy,
-          }).png({ compressionLevel: 0 })
+          }).png({ compressionLevel: 3 })
 
           const fullFileName = `/tmp/${crypto.randomUUID()}.png`
           await outputImage.toFile(fullFileName)
