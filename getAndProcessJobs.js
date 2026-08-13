@@ -49,7 +49,7 @@ const getAndProcessJobs = async () => {
           const sharpImage = await sharp(await urlResponse.arrayBuffer())
           const { width, height, orientation } = await sharpImage.metadata()
 
-          const isVertical = height > width || [5, 6, 7, 8].includes(orientation)
+          const isVertical = height > width
 
           const aspectRatio = size.split('x').map(Number).reverse().reduce((acc, i) => i / acc, 1)
 
