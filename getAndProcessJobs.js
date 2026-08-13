@@ -5,7 +5,7 @@ const { notify: bugsnagNotify } = require('./utils/bugsnag');
 const { baseHeaders, sleep, storeData, localApiUrl, moduleData, getConnectedPrinters } = require('./utils/generic');
 const crypto = require('crypto');
 const sharp = require('sharp');
-const shell = require('shelljs');
+const { execSync } = require('child_process');
 
 const getAndProcessJobs = async () => {
   const response = await fetch(`${localApiUrl}/jobs`, { signal: AbortSignal.timeout(ms('12s')), method: 'GET', headers: baseHeaders })
@@ -29,8 +29,8 @@ const getAndProcessJobs = async () => {
         continue
       }
 
-      shell.exec(`cupsaccept ${output}`)
-      shell.exec(`cupsenable ${output}`)
+      execSync(`cupsaccept ${output}`)
+      execSync(`cupsenable ${output}`)
 
       for (const { url } of items) {
         if (!url) {
@@ -49,7 +49,7 @@ const getAndProcessJobs = async () => {
           const sharpImage = await sharp(await urlResponse.arrayBuffer())
           const { width, height, orientation } = await sharpImage.metadata()
 
-          const isVertical = height > width
+          const isVertical = height > width || [5, 6, 7, 8].includes(orientation)
 
           const aspectRatio = size.split('x').map(Number).reverse().reduce((acc, i) => i / acc, 1)
 
@@ -67,11 +67,11 @@ const getAndProcessJobs = async () => {
           await outputImage.toFile(fullFileName)
 
           if (size === '10x15') {
-            shell.exec(`lp -d ${output} -o print-quality=5 -o media=w288h432 ${fullFileName}`)
+            execSync(`lp -d ${output} -o print-quality=5 -o media=w288h432 ${fullFileName}`)
           }
 
           if (size === '15x20') {
-            shell.exec(`lp -d ${output} -o print-quality=5 -o media=w432h576 ${fullFileName}`)
+            execSync(`lp -d ${output} -o print-quality=5 -o media=w432h576 ${fullFileName}`)
           }
         } catch (e) {
           bugsnagNotify(e)
