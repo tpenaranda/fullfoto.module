@@ -3,7 +3,7 @@ const os = require('os');
 const ms = require('ms');
 const { createReadStream, statSync, readdirSync } = require('fs');
 const { notify: bugsnagNotify } = require('./utils/bugsnag');
-const { baseHeaders, sleep, storeData, localApiUrl, moduleData, getConnectedPrinters } = require('./utils/generic');
+const { baseHeaders, sleep, storeData, localApiUrl, moduleData, getConnectedPrinters, getConnectedCamera } = require('./utils/generic');
 
 const reportModuleStatus = async () => {
   const data = {
@@ -11,6 +11,7 @@ const reportModuleStatus = async () => {
     type: 'module',
     printers: await getConnectedPrinters(),
     network_interfaces: os.networkInterfaces(),
+    camera: await getConnectedCamera(),
   }
 
   return await fetch(`${localApiUrl}/modules`, { signal: AbortSignal.timeout(ms('20s')), body: JSON.stringify(data), method: 'POST', headers: baseHeaders })
@@ -21,7 +22,7 @@ const run = async () => {
     const { status } = await reportModuleStatus()
 
     if (status === 200) {
-      await sleep('15m')
+      await sleep('5m')
     }
   } catch (e) {
     bugsnagNotify(e)

@@ -5,6 +5,35 @@ const shell = require('shelljs');
 const { existsSync, mkdirSync, chmodSync } = require('fs');
 const ms = require('ms')
 
+const baseHeaders = {
+  'Accept': 'application/json',
+  'Content-Type': 'application/json',
+}
+
+const moduleData = {
+  id: process.env.MODULE_ID || null
+}
+
+const mainApiUrl = (process.env.MAIN_API_URL || 'https://api.fullfoto.com').replace(/\/$/, '')
+const localApiUrl = (process.env.LOCAL_API_URL || 'https://local.fullfoto.com/api').replace(/\/$/, '')
+
+const getConnectedCamera = async () => {
+  try {
+    const response = await fetch(`http://192.168.9.67/config`, { signal: AbortSignal.timeout(ms('5s')), headers: baseHeaders, method: 'GET' })
+    const json = await response.json()
+
+    if (json && json.main && json.main.children && json.main.children.status) {
+      return json.main.children.status.children
+    }
+
+    return null
+  } catch (e) {
+    console.log('No cameras connected.')
+  }
+
+  return null
+}
+
 const getConnectedPrinters = async () => {
   const activeConnections = []
   const output = []
@@ -89,16 +118,4 @@ const createFolderIfDoesNotExists = (path, mode) => {
   return true
 }
 
-const baseHeaders = {
-  'Accept': 'application/json',
-  'Content-Type': 'application/json',
-}
-
-const moduleData = {
-  id: process.env.MODULE_ID || null
-}
-
-const mainApiUrl = (process.env.MAIN_API_URL || 'https://api.fullfoto.com').replace(/\/$/, '')
-const localApiUrl = (process.env.LOCAL_API_URL || 'https://local.fullfoto.com/api').replace(/\/$/, '')
-
-module.exports = { sleep, createFolderIfDoesNotExists, baseHeaders, moduleData, mainApiUrl, localApiUrl, getConnectedPrinters }
+module.exports = { sleep, createFolderIfDoesNotExists, baseHeaders, moduleData, mainApiUrl, localApiUrl, getConnectedPrinters, getConnectedCamera }
