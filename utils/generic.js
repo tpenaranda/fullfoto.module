@@ -28,7 +28,7 @@ const getConnectedCamera = async () => {
 
     return null
   } catch (e) {
-    console.log('No cameras connected.')
+    console.log('No camera connected.')
   }
 
   return null

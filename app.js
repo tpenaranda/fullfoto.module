@@ -29,7 +29,7 @@ app.use(cors({ maxAge: ms('1h') }));
 app.use('/api', apiRouter);
 
 app.use((req, res, next) => {
-  return res.render('index', { title: 'FullFoto', text: `${moduleData.id || '?'} | FullFoto` });
+  return res.render('index', { title: 'Fullfoto', text: `${moduleData.id || '?'} | Fullfoto` });
 });
 
 module.exports = app;

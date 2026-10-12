@@ -8,7 +8,7 @@ const sharp = require('sharp');
 const { execSync } = require('child_process');
 
 const getAndProcessJobs = async () => {
-  const response = await fetch(`${localApiUrl}/jobs`, { signal: AbortSignal.timeout(ms('12s')), method: 'GET', headers: baseHeaders })
+  const response = await fetch(`${localApiUrl}/jobs`, { signal: AbortSignal.timeout(ms('10s')), method: 'GET', headers: baseHeaders })
   const jsonData = await response.json()
 
   if (!jsonData || !jsonData.data || !jsonData.data.length) {
@@ -26,6 +26,7 @@ const getAndProcessJobs = async () => {
       const { method, size, items, output, position } = data
 
       if (!['10x15', '15x20'].includes(size) || method !== 'single' || !items || !items.length || !connectedPrinters.map(i => i.name).includes(output)) {
+        bugsnagNotify(new Error('Data issue at getAndProcessJobs()'), event => { event.addMetadata('metadata', { size, method, items, connectedPrinters }) })
         continue
       }
 
@@ -38,7 +39,7 @@ const getAndProcessJobs = async () => {
         }
 
         try {
-          const patchResponse = await fetch(`${localApiUrl}/jobs/${id}`, { signal: AbortSignal.timeout(ms('20s')), body: JSON.stringify({ status: 'in_progress' }), method: 'PATCH', headers: baseHeaders })
+          const patchResponse = await fetch(`${localApiUrl}/jobs/${id}`, { signal: AbortSignal.timeout(ms('15s')), body: JSON.stringify({ status: 'in_progress' }), method: 'PATCH', headers: baseHeaders })
 
           if (patchResponse.status !== 200) {
             continue
@@ -78,7 +79,7 @@ const getAndProcessJobs = async () => {
         }
       }
 
-      await fetch(`${localApiUrl}/jobs/${id}`, { signal: AbortSignal.timeout(ms('20s')), body: JSON.stringify({ status: 'completed' }), method: 'PATCH', headers: baseHeaders })
+      await fetch(`${localApiUrl}/jobs/${id}`, { signal: AbortSignal.timeout(ms('15s')), body: JSON.stringify({ status: 'completed' }), method: 'PATCH', headers: baseHeaders })
     }
   }
 
@@ -90,7 +91,7 @@ const run = async () => {
     await getAndProcessJobs()
   } catch (e) {
     bugsnagNotify(e)
-    await sleep('2m')
+    await sleep('30s')
   } finally {
     const now = new Date()
     console.info(`${now.toGMTString()} | getAndProcessJobs() Done.`)
