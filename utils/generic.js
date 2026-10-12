@@ -1,8 +1,9 @@
 require('dotenv').config()
 
-const { notify: bugsnagNotify } = require('./bugsnag');
-const shell = require('shelljs');
-const { existsSync, mkdirSync, chmodSync } = require('fs');
+const { notify: bugsnagNotify } = require('./bugsnag')
+const shell = require('shelljs')
+const { existsSync, mkdirSync, chmodSync } = require('fs')
+const { getKey, setKey } = require('./cache')
 const ms = require('ms')
 
 const baseHeaders = {
@@ -35,6 +36,13 @@ const getConnectedCamera = async () => {
 }
 
 const getConnectedPrinters = async () => {
+  const cacheKey = 'connected_printers'
+  const cachedOutput = await getKey(cacheKey)
+
+  if (cachedOutput) {
+    return cachedOutput
+  }
+
   const activeConnections = []
   const output = []
 
@@ -85,6 +93,10 @@ const getConnectedPrinters = async () => {
     bugsnagNotify(e)
   }
 
+  if (output.length) {
+    await setKey(cacheKey, output, ms('12h'))
+  }
+
   return output
 }
 
@@ -99,7 +111,7 @@ const createFolderIfDoesNotExists = (path, mode) => {
     return false
   }
 
-  mkdirSync(path, { recursive: true });
+  mkdirSync(path, { recursive: true })
 
   const parts = path.split('/').filter(i => i)
 
