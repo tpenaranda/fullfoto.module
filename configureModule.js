@@ -1,7 +1,7 @@
 const { notify: bugsnagNotify } = require('./utils/bugsnag')
 const { sleep, createFolderIfDoesNotExists, baseHeaders, storeData, mainApiUrl, localApiUrl } = require('./utils/generic')
 const readdir = require('@folder/readdir')
-const { statSync, unlinkSync, readdirSync, renameSync, copyFileSync, chmodSync } = require('fs')
+const { statSync, unlinkSync, readdirSync, renameSync, copyFileSync, chmodSync, rmSync } = require('fs')
 const { execSync } = require('child_process');
 const diskSpace = require('check-disk-space').default
 const os = require('os')
@@ -45,6 +45,8 @@ const run = async () => {
   try {
     const now = new Date()
     console.info(`${now.toGMTString()} | configureModule() Start.`)
+
+    rmSync('disk_store_cache', { recursive: true, force: true })
 
     const response = await configureModule()
   } catch (e) {

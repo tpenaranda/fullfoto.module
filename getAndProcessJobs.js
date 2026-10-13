@@ -50,16 +50,19 @@ const getAndProcessJobs = async () => {
           const sharpImage = await sharp(await urlResponse.arrayBuffer())
           const { width, height, orientation } = await sharpImage.metadata()
 
-          const isVertical = height > width
+          const isVertical = height > width || [5, 6, 7, 8].includes(orientation)
 
-          const aspectRatio = size.split('x').map(Number).reverse().reduce((acc, i) => i / acc, 1)
+          const sizeParts = size.split('x').map(Number)
 
-          const outputWidth = !isVertical ? width : (height * aspectRatio)
-          const outputHeight = !isVertical ? (width * aspectRatio) : height
+          if (isVertical) {
+            sizeParts.reverse()
+          }
 
-          const outputImage = sharpImage.resize({
-            width: Math.round(outputWidth),
-            height: Math.round(outputHeight),
+          const aspectRatio = sizeParts.reduce((acc, i) => i / acc, 1)
+
+          const outputImage = sharpImage.rotate().resize({
+            width: Math.round(height * aspectRatio),
+            height: Math.round(height),
             fit: sharp.fit.cover,
             position: position || sharp.strategy.entropy,
           }).png({ compressionLevel: 3 })
